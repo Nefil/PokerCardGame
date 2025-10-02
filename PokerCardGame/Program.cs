@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PokerCardGame.models;
+using System;
 using System.Numerics;
 
 namespace PokerCardGame
@@ -7,6 +8,13 @@ namespace PokerCardGame
     {
         static void Main(string[] args)
         {
+
+            using (var db = new Data.GameDbContext())
+            {
+                db.Database.EnsureCreated();
+            }
+
+
             Console.WriteLine("Welcome to the Poker Card Game!");
             Console.WriteLine("What's your name?");
             string playerName = Console.ReadLine();

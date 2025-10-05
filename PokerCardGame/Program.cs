@@ -9,9 +9,18 @@ namespace PokerCardGame
         static void Main(string[] args)
         {
 
+            SQLitePCL.Batteries.Init();
+            
             using (var db = new Data.GameDbContext())
             {
-                db.Database.EnsureCreated();
+                try
+                {
+                    db.Database.EnsureCreated();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Database creation error: {ex.Message}");
+                }
             }
 
 

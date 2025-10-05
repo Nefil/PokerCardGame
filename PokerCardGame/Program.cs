@@ -10,7 +10,8 @@ namespace PokerCardGame
         {
 
             SQLitePCL.Batteries.Init();
-            
+
+            // Ensure database is created
             using (var db = new Data.GameDbContext())
             {
                 try

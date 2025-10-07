@@ -1,4 +1,5 @@
-﻿using PokerCardGame.models;
+﻿using PokerCardGame.Data;
+using PokerCardGame.models;
 using System;
 using System.Numerics;
 
@@ -8,29 +9,91 @@ namespace PokerCardGame
     {
         static void Main(string[] args)
         {
-
-            SQLitePCL.Batteries.Init();
-
-            // Ensure database is created
-            using (var db = new Data.GameDbContext())
+            // Creating a database if it does not exist
+            var connectionString = "Data Source=GameDB.db";
+            using (var db = new GameDbContext(connectionString))
             {
-                try
-                {
-                    db.Database.EnsureCreated();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Database creation error: {ex.Message}");
-                }
+                bool created = db.Database.EnsureCreated();
             }
 
 
             Console.WriteLine("Welcome to the Poker Card Game!");
             Console.WriteLine("What's your name?");
-            string playerName = Console.ReadLine();
+            string _playerName = Console.ReadLine();
 
-            Player player = new Player(playerName);
-            player.Wallet = 500;
+            // Check if the player exists in the database
+            Player player;
+            using (var db = new GameDbContext(connectionString))
+            {
+                var existingPlayer = db.Players.FirstOrDefault(p => p.PlayerName == _playerName);
+
+                if (existingPlayer != null)
+                {
+                    // If the player already exists
+                    Console.WriteLine($"Witaj z powrotem, {_playerName}!");
+
+                    if (existingPlayer.Money > 0)
+                    {
+                        Console.WriteLine($"Znaleziono Twój portfel: {existingPlayer.Money}$");
+                        Console.WriteLine("Czy chcesz wczytać ten stan? (t/n)");
+                        string loadResponse = Console.ReadLine().ToLower();
+
+                        if (loadResponse == "t")
+                        {
+                            // Load wallet balance
+                            player = new Player(_playerName);
+                            player.Wallet = (int)existingPlayer.Money;  // Pobierz wartość z bazy
+                            Console.WriteLine($"Wczytano portfel: {player.Wallet}$");
+                        }
+                        else
+                        {
+                            // Reset wallet to default value
+                            player = new Player(_playerName);
+                            player.Wallet = 500;  // Ustaw domyślną wartość
+
+                            // Update in the database
+                            existingPlayer.Money = 500;
+                            db.SaveChanges();
+                            Console.WriteLine($"Zresetowano portfel do domyślnej wartości: {player.Wallet}$");
+                        }
+                    }
+                    else
+                    {
+                        // Empty wallet 
+                        Console.WriteLine("Twój portfel jest pusty!");
+                        Console.WriteLine("Czy chcesz zagrać od nowa z tym samym nickiem? (t/n)");
+                        string restartResponse = Console.ReadLine().ToLower();
+
+                        if (restartResponse == "t")
+                        {
+                            // Reset wallet to default value
+                            player = new Player(_playerName);
+                            player.Wallet = 500;  // Ustaw domyślną wartość
+
+                            // Update in the database
+                            existingPlayer.Money = 500;
+                            db.SaveChanges();
+                            Console.WriteLine($"Zresetowano portfel do {player.Wallet}$");
+                        }
+                        else
+                        {
+                            // Exit the game
+                            Console.WriteLine("Dziękujemy za grę!");
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    // New player - add to database
+                    player = new Player(_playerName);
+                    player.Wallet = 500;  // Ustaw domyślną wartość
+
+                    db.Players.Add(new Players { PlayerName = _playerName, Money = 500 });
+                    db.SaveChanges();
+                    Console.WriteLine($"Witaj, {_playerName}! Twój początkowy portfel: {player.Wallet}$");
+                }
+            }
 
             LogicAI AI = new LogicAI("AI");
 
@@ -186,6 +249,18 @@ namespace PokerCardGame
             }
 
             Console.WriteLine("Thank you for playing!");
+
+            // Aktualizacja stanu portfela w bazie na koniec gry
+            using (var db = new GameDbContext(connectionString))
+            {
+                var playerToUpdate = db.Players.FirstOrDefault(p => p.PlayerName == player.Name);
+                if (playerToUpdate != null)
+                {
+                    playerToUpdate.Money = player.Wallet;
+                    db.SaveChanges();
+                    Console.WriteLine($"Stan portfela zapisany w bazie danych: {player.Wallet}$");
+                }
+            }
         }
     }
 }

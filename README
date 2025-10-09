@@ -1,0 +1,51 @@
+# PokerCardGame
+
+## Project Description
+
+PokerCardGame is a console card game written in C#. The project demonstrates object-oriented programming (OOP), design patterns (Strategy, Singleton), and the use of a local SQLite database to store game statistics. The game allows matches against AI opponents.
+
+## Features
+
+- Game skeleton: player classes, deck of cards, game mechanics
+- AI opponents based on the Strategy pattern
+- Saving game statistics in a local SQLite database file
+- Example use of the Singleton pattern
+- Project documentation in README
+
+## Technologies
+
+- C# (.NET)
+- SQLite (local file database)
+- Console user interface
+- Design patterns: Strategy, Singleton
+
+## Installation and Running
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/Nefil/PokerCardGame.git
+   ```
+2. Open the project in Visual Studio.
+3. Build the project and run the game from the console.
+
+## Usage Example
+
+Start the game, choose the number of players and opponent type (AI or human), and begin your match. Game statistics will be saved automatically in the SQLite database file.
+
+## Potential Project Extensions
+
+- Adding a graphical interface (e.g., WPF)
+- Expanding game mechanics with new modes
+- Match and statistics history
+- **Allowing the user to change the game language** – add language selection (e.g., Polish/English) in application settings, and use resource files for translating messages
+- Exporting results to files
+- Adding unit tests for game logic
+- CI/CD integration (e.g., GitHub Actions)
+
+## Author
+
+Daniel Segeth
+
+## License
+
+Project licensed under MIT.

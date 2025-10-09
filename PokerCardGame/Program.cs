@@ -1,7 +1,5 @@
 ﻿using PokerCardGame.Data;
 using PokerCardGame.models;
-using System;
-using System.Numerics;
 
 namespace PokerCardGame
 {
@@ -16,70 +14,118 @@ namespace PokerCardGame
                 bool created = db.Database.EnsureCreated();
             }
 
+            Console.WriteLine("Welcome to the Poker Card Game! What are we gonna do?");
+            Console.WriteLine("1. Play\n2. Exit");
+            string option = Console.ReadLine();
 
-            Console.WriteLine("Welcome to the Poker Card Game!");
+            switch (option)
+            {
+                case "1": // Play
+                    Console.Clear(); 
+                    PlayGame(connectionString);
+                    break;
+
+                case "2":
+                    Console.WriteLine("Thank you for visiting! Goodbye!");
+                    return; // Exit the game
+
+                default:
+                    Console.WriteLine("Invalid option. Please select 1 or 2.");
+                    break;
+            }
+        }
+
+        static void PlayGame(string connectionString)
+        {
             Console.WriteLine("What's your name?");
             string _playerName = Console.ReadLine();
+            Console.Clear(); 
 
-            // Check if the player exists in the database
-            Player player;
+            // Initialize player as null
+            Player player = null;
             using (var db = new GameDbContext(connectionString))
             {
                 var existingPlayer = db.Players.FirstOrDefault(p => p.PlayerName == _playerName);
 
+                // Options for existing player
                 if (existingPlayer != null)
                 {
                     // If the player already exists
-                    Console.WriteLine($"Witaj z powrotem, {_playerName}!");
+                    bool validChoice = false;
+                    string choice;
 
-                    if (existingPlayer.Money > 0)
+                    while (!validChoice)
                     {
-                        Console.WriteLine($"Znaleziono Twój portfel: {existingPlayer.Money}$");
-                        Console.WriteLine("Czy chcesz wczytać ten stan? (t/n)");
-                        string loadResponse = Console.ReadLine().ToLower();
+                        Console.WriteLine($"User with nickname '{_playerName}' already exists!");
+                        Console.WriteLine("1. Load existing data");
+                        Console.WriteLine("2. Start over (overwrite data)");
+                        Console.WriteLine("3. Choose different nickname");
+                        Console.WriteLine("4. Exit");
 
-                        if (loadResponse == "t")
-                        {
-                            // Load wallet balance
-                            player = new Player(_playerName);
-                            player.Wallet = (int)existingPlayer.Money;  // Pobierz wartość z bazy
-                            Console.WriteLine($"Wczytano portfel: {player.Wallet}$");
-                        }
-                        else
-                        {
-                            // Reset wallet to default value
-                            player = new Player(_playerName);
-                            player.Wallet = 500;  // Ustaw domyślną wartość
+                        choice = Console.ReadLine();
 
-                            // Update in the database
-                            existingPlayer.Money = 500;
-                            db.SaveChanges();
-                            Console.WriteLine($"Zresetowano portfel do domyślnej wartości: {player.Wallet}$");
-                        }
-                    }
-                    else
-                    {
-                        // Empty wallet 
-                        Console.WriteLine("Twój portfel jest pusty!");
-                        Console.WriteLine("Czy chcesz zagrać od nowa z tym samym nickiem? (t/n)");
-                        string restartResponse = Console.ReadLine().ToLower();
-
-                        if (restartResponse == "t")
+                        switch (choice)
                         {
-                            // Reset wallet to default value
-                            player = new Player(_playerName);
-                            player.Wallet = 500;  // Ustaw domyślną wartość
+                            case "1": // Load existing data
+                                player = new Player(_playerName);
+                                player.Wallet = (int)existingPlayer.Money;
+                                Console.WriteLine($"Welcome back, {_playerName}! Loaded wallet: {player.Wallet}$");
+                                Console.WriteLine("Press any key to continue...");
+                                Console.ReadKey();
+                                Console.Clear(); 
+                                validChoice = true;
+                                break;
 
-                            // Update in the database
-                            existingPlayer.Money = 500;
-                            db.SaveChanges();
-                            Console.WriteLine($"Zresetowano portfel do {player.Wallet}$");
-                        }
-                        else
-                        {
-                            // Exit the game
-                            Console.WriteLine("Dziękujemy za grę!");
-                            return;
+                            case "2": // Overwrite data
+                                player = new Player(_playerName);
+                                player.Wallet = 500; // Default value
+                                existingPlayer.Money = 500;
+                                db.SaveChanges();
+                                Console.WriteLine($"Hello, {_playerName}! Reset wallet to {player.Wallet}$");
+                                validChoice = true;
+                                break;
+
+                            case "3": // Choose different nickname or exit
+                                Console.WriteLine("Enter new nickname (or type 'exit' to quit the game): ");
+                                _playerName = Console.ReadLine();
+
+                                // Check if user wants to exit the game
+                                if (_playerName.ToLower() == "exit")
+                                {
+                                    Console.WriteLine("Thanks for playing!");
+                                    return; // Exit the game
+                                }
+
+                                // Check if new nickname already exists in the database
+                                while (db.Players.Any(p => p.PlayerName == _playerName))
+                                {
+                                    Console.WriteLine("This nickname is also taken!");
+                                    Console.WriteLine("Enter another nickname (or type 'exit' to quit the game): ");
+                                    _playerName = Console.ReadLine();
+
+                                    if (_playerName.ToLower() == "exit")
+                                    {
+                                        Console.WriteLine("Thanks for playing!");
+                                        return; // Exit the game
+                                    }
+                                }
+
+                                // New player - add to database
+                                player = new Player(_playerName);
+                                player.Wallet = 500;
+                                db.Players.Add(new Players { PlayerName = _playerName, Money = 500 });
+                                db.SaveChanges();
+                                Console.WriteLine($"Welcome, {_playerName}! Your starting wallet: {player.Wallet}$");
+                                validChoice = true;
+                                break;
+
+                            case "4": // Exit game
+                                Console.WriteLine("Thanks for playing!");
+                                return; // Exit the game
+
+                            default:
+                                Console.WriteLine("Invalid choice. Please select an option from 1 to 4.\n");
+                                break;
                         }
                     }
                 }
@@ -87,11 +133,14 @@ namespace PokerCardGame
                 {
                     // New player - add to database
                     player = new Player(_playerName);
-                    player.Wallet = 500;  // Ustaw domyślną wartość
+                    player.Wallet = 500;  // Set default value
 
                     db.Players.Add(new Players { PlayerName = _playerName, Money = 500 });
                     db.SaveChanges();
-                    Console.WriteLine($"Witaj, {_playerName}! Twój początkowy portfel: {player.Wallet}$");
+                    Console.WriteLine($"Welcome, {_playerName}! Your starting wallet: {player.Wallet}$");
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
+                    Console.Clear(); 
                 }
             }
 
@@ -101,7 +150,7 @@ namespace PokerCardGame
 
             while (continuePlaying && player.Wallet > 0)
             {
-                Console.Clear(); // Clear screen before a new round
+                Console.Clear(); 
 
                 // Base rate
                 int baseRate = 10;
@@ -243,6 +292,9 @@ namespace PokerCardGame
                     break;
                 }
 
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+                Console.Clear(); 
                 Console.WriteLine("Continue playing? y/n");
                 string response = Console.ReadLine().ToLower();
                 continuePlaying = response != "n";
@@ -250,7 +302,7 @@ namespace PokerCardGame
 
             Console.WriteLine("Thank you for playing!");
 
-            // Aktualizacja stanu portfela w bazie na koniec gry
+            // Update wallet balance in database at the end of the game
             using (var db = new GameDbContext(connectionString))
             {
                 var playerToUpdate = db.Players.FirstOrDefault(p => p.PlayerName == player.Name);
@@ -258,7 +310,7 @@ namespace PokerCardGame
                 {
                     playerToUpdate.Money = player.Wallet;
                     db.SaveChanges();
-                    Console.WriteLine($"Stan portfela zapisany w bazie danych: {player.Wallet}$");
+                    Console.WriteLine($"Wallet balance saved in database: {player.Wallet}$");
                 }
             }
         }

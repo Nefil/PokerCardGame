@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PokerCardGame.Data; 
 
-namespace PokerCardGame.Data // poprawiona spójność namespace
+namespace PokerCardGame.Data 
 {
     public class GameDbContext : DbContext
     {

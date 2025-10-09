@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace PokerCardGame.models
 {
     internal class GameLogic
@@ -32,7 +27,7 @@ namespace PokerCardGame.models
                 return 1; // high card
         }
 
-        // Metoda pomocnicza do uzyskania nazwy układu kart
+        // Helper method to get the name of the hand
         public static string GetHandName(int handValue)
         {
             switch (handValue)

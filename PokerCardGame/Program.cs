@@ -14,24 +14,32 @@ namespace PokerCardGame
                 bool created = db.Database.EnsureCreated();
             }
 
-            Console.WriteLine("Welcome to the Poker Card Game! What are we gonna do?");
-            Console.WriteLine("1. Play\n2. Exit");
-            string option = Console.ReadLine();
-
-            switch (option)
+            bool exitGame = false;
+            while (!exitGame)
             {
-                case "1": // Play
-                    Console.Clear(); 
-                    PlayGame(connectionString);
-                    break;
+                Console.Clear();
+                Console.WriteLine("Welcome to the Poker Card Game! What are we gonna do?");
+                Console.WriteLine("1. Play\n2. Exit");
+                string option = Console.ReadLine();
 
-                case "2":
-                    Console.WriteLine("Thank you for visiting! Goodbye!");
-                    return; // Exit the game
+                switch (option)
+                {
+                    case "1": // Play
+                        Console.Clear(); 
+                        PlayGame(connectionString);
+                        break;
 
-                default:
-                    Console.WriteLine("Invalid option. Please select 1 or 2.");
-                    break;
+                    case "2":
+                        Console.WriteLine("Thank you for visiting! Goodbye!");
+                        exitGame = true;
+                        break;
+
+                    default:
+                        Console.WriteLine("Invalid option. Please select 1 or 2.");
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey();
+                        break;
+                }
             }
         }
 
@@ -292,9 +300,6 @@ namespace PokerCardGame
                     break;
                 }
 
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey();
-                Console.Clear(); 
                 Console.WriteLine("Continue playing? y/n");
                 string response = Console.ReadLine().ToLower();
                 continuePlaying = response != "n";
@@ -310,9 +315,11 @@ namespace PokerCardGame
                 {
                     playerToUpdate.Money = player.Wallet;
                     db.SaveChanges();
-                    Console.WriteLine($"Wallet balance saved in database: {player.Wallet}$");
                 }
             }
+
+            Console.WriteLine("Press any key to return to main menu...");
+            Console.ReadKey();
         }
     }
 }

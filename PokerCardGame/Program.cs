@@ -94,15 +94,8 @@ namespace PokerCardGame
                                 break;
 
                             case "3": // Choose different nickname or exit
-                                Console.WriteLine("Enter new nickname (or type 'exit' to quit the game): ");
+                                Console.WriteLine("Enter new nickname: ");
                                 _playerName = Console.ReadLine();
-
-                                // Check if user wants to exit the game
-                                if (_playerName.ToLower() == "exit")
-                                {
-                                    Console.WriteLine("Thanks for playing!");
-                                    return; // Exit the game
-                                }
 
                                 // Check if new nickname already exists in the database
                                 while (db.Players.Any(p => p.PlayerName == _playerName))

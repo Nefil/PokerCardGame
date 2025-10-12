@@ -1,5 +1,4 @@
-﻿
-namespace PokerCardGame.models
+﻿namespace PokerCardGame.Classes
 {
     internal class GameLogic
     {

@@ -1,5 +1,6 @@
-﻿using PokerCardGame.Data;
-using PokerCardGame.models;
+﻿using PokerCardGame.Classes;
+using PokerCardGame.Data;
+using PokerCardGame.Models;
 
 namespace PokerCardGame
 {

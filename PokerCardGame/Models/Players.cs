@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PokerCardGame.Data
+namespace PokerCardGame.Models
 {
     public class Players
     {

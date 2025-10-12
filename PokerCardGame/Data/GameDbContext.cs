@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PokerCardGame.Models;
 
-namespace PokerCardGame.Data 
+namespace PokerCardGame.Data
 {
     public class GameDbContext : DbContext
     {

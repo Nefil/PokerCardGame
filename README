@@ -10,7 +10,6 @@ PokerCardGame is a console card game written in C#. The project demonstrates obj
 - AI opponents based on the Strategy pattern
 - Saving game statistics in a local SQLite database file
 - Example use of the Singleton pattern
-- Project documentation in README
 
 ## Technologies
 
@@ -27,10 +26,6 @@ PokerCardGame is a console card game written in C#. The project demonstrates obj
    ```
 2. Open the project in Visual Studio.
 3. Build the project and run the game from the console.
-
-## Usage Example
-
-Start the game, choose the number of players and opponent type (AI or human), and begin your match. Game statistics will be saved automatically in the SQLite database file.
 
 ## Potential Project Extensions
 
